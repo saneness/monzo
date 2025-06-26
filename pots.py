@@ -33,7 +33,10 @@ if __name__ == '__main__':
     headers = {'Authorization': ACCESS_TOKEN}
     request = requests.get(f'https://api.monzo.com/pots?current_account_id={ACCOUNT_ID}', headers=headers)
     balance = int([item for item in request.json()['pots'] if item['has_virtual_cards']][0]['balance'])/100.0
-    converted = round(CurrencyConverter().convert(balance, 'GBP', f'{args.convert}'), 2)
+    if args.convert in ["JPY"]:
+        converted = int(round(CurrencyConverter().convert(balance, 'GBP', f'{args.convert}'), 0))
+    else:
+        converted = round(CurrencyConverter().convert(balance, 'GBP', f'{args.convert}'), 2)
     new_balance_gbp = f'{balance}'
     new_balance_con = f'{converted}'
 
