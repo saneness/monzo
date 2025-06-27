@@ -19,7 +19,7 @@ def args():
 
 def send_message(text):
     for chat_id in CHAT_IDS:
-        data = json.dumps({"chat_id": chat_id, "text": text, "parse_mode": 'markdown', "disable_notification": False})
+        data = json.dumps({"chat_id": chat_id, "text": text, "parse_mode": 'markdown', "disable_notification": True})
         cmd = f"curl -X POST 'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage' -H 'Content-Type: application/json' -d '{data}'"
         os.system(cmd)
         time.sleep(1)
