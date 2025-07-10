@@ -40,11 +40,12 @@ if __name__ == '__main__':
     new_balance_gbp = f'{balance}'
     new_balance_con = f'{converted}'
 
-    if os.path.exists(POT_PATH):
+    try:
         old_balance_gbp = open(POT_PATH).read().strip().split()[0]
         old_balance_con = open(POT_PATH).read().strip().split()[2][1:]
         if new_balance_gbp != old_balance_gbp:
             open(POT_PATH, 'w+').write(f'{new_balance_gbp} GBP ({new_balance_con} {args.convert})')
             send_message(f"`GBP: {old_balance_gbp} -> {new_balance_gbp}`\n`{args.convert}: {old_balance_con} -> {new_balance_con}`")
-    else:
+    except:
+        new_balance = f'{new_balance_gbp} GBP ({new_balance_con} {args.convert})'
         open(POT_PATH, 'w+').write(new_balance)
