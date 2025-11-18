@@ -52,5 +52,6 @@ if __name__ == '__main__':
         except:
             new_balance = f'{new_balance_gbp} GBP ({new_balance_con} {args.convert})'
             open(POT_PATH, 'w+').write(new_balance)
-    except:
+    except Exception as e:
+        print(e)
         open(POT_PATH_ERROR, 'w+').write('ERROR')
