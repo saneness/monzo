@@ -18,6 +18,6 @@ if __name__ == '__main__':
     auth = f'https://auth.monzo.com/?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&response_type=code&state={STATE_TOKEN}'
     print(auth)
 
-    AUTH_CODE = open('.auth_code').read()
+    AUTH_CODE = open('.auth_code').read().strip()
     token = f'http --form POST "https://api.monzo.com/oauth2/token" "grant_type=authorization_code" "client_id={CLIENT_ID}" "client_secret={CLIENT_SECRET}" "redirect_uri={REDIRECT_URI}" "code={AUTH_CODE}"'
     print(token)
