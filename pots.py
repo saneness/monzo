@@ -7,6 +7,7 @@ import requests
 import json
 import os
 import time
+import traceback
 from currency_converter import CurrencyConverter
 
 from config import *
@@ -32,6 +33,8 @@ if __name__ == '__main__':
 
     headers = {'Authorization': ACCESS_TOKEN}
     request = requests.get(f'https://api.monzo.com/pots?current_account_id={ACCOUNT_ID}', headers=headers)
+    if 'code' in request.json():
+        print(f"Request code: {request.json()['code']}")
     try:
         balance = int([item for item in request.json()['pots'] if item['has_virtual_cards']][0]['balance'])/100.0
         if os.path.exists(POT_PATH_ERROR):
@@ -53,5 +56,5 @@ if __name__ == '__main__':
             new_balance = f'{new_balance_gbp} GBP ({new_balance_con} {args.convert})'
             open(POT_PATH, 'w+').write(new_balance)
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         open(POT_PATH_ERROR, 'w+').write('ERROR')
