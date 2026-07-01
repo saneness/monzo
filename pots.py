@@ -8,7 +8,6 @@ import json
 import os
 import time
 import traceback
-from forex_python.converter import CurrencyCodes
 
 from config import *
 
@@ -28,6 +27,11 @@ def send_message(text):
 if __name__ == '__main__':
     args = args()
 
+    SYMBOL = {
+        "GBP": "£",
+        "JPY": "¥"
+    }
+
     FORMAT = {
         "GBP": ".2f",
         "JPY": ".0f"
@@ -44,7 +48,6 @@ if __name__ == '__main__':
         balance = int([item for item in request.json()['pots'] if item['has_virtual_cards']][0]['balance'])/100.0
         if os.path.exists(POT_PATH_ERROR):
             os.remove(POT_PATH_ERROR)
-        codes = CurrencyCodes()
         rate = float(open(f'{RATE_PATH}').read())
         converted = balance * rate
         if args.convert in ['JPY']:
@@ -56,19 +59,21 @@ if __name__ == '__main__':
 
         try:
             old_balance_gbp = open(POT_PATH).read().strip().split()[0]
-            if new_balance_gbp != old_balance_gbp:
-                balance_change_gbp = float(new_balance_gbp)-float(old_balance_gbp)
-                balance_change_con = rates.convert('GBP', f'{args.convert}', balance_change_gbp)
-                balance_change_sign_gbp = '+' if balance_change_gbp > 0 else '-'
-                balance_change_sign_con = '+' if balance_change_con > 0 else '-'
-                send_message(
-                    f"`New balance:`\n`{codes.get_symbol('GBP')}{new_balance_gbp} ({balance_change_sign_gbp}{codes.get_symbol('GBP')}{abs(balance_change_gbp):{FORMAT['GBP']}})`\n" \
-                    f"`{codes.get_symbol(args.convert)}{new_balance_con} ({balance_change_sign_con}{codes.get_symbol(args.convert)}{abs(balance_change_con):{FORMAT[args.convert]}})`"
-                )
-                open(POT_PATH, 'w+').write(f'{new_balance_gbp} GBP ({new_balance_con} {args.convert})')
         except:
             new_balance = f'{new_balance_gbp} GBP ({new_balance_con} {args.convert})'
             open(POT_PATH, 'w+').write(new_balance)
+            old_balance_gbp = new_balance_gbp
+
+        if new_balance_gbp != old_balance_gbp:
+            balance_change_gbp = float(new_balance_gbp)-float(old_balance_gbp)
+            balance_change_con = balance_change_gbp * rate
+            balance_change_sign_gbp = '+' if balance_change_gbp > 0 else '-'
+            balance_change_sign_con = '+' if balance_change_con > 0 else '-'
+            send_message(
+                f"`New balance:`\n`{SYMBOL['GBP']}{new_balance_gbp} ({balance_change_sign_gbp}{SYMBOL['GBP']}{abs(balance_change_gbp):{FORMAT['GBP']}})`\n" \
+                f"`{SYMBOL[args.convert]}{new_balance_con} ({balance_change_sign_con}{SYMBOL[args.convert]}{abs(balance_change_con):{FORMAT[args.convert]}})`"
+            )
+            open(POT_PATH, 'w+').write(f'{new_balance_gbp} GBP ({new_balance_con} {args.convert})')
     except Exception as e:
         traceback.print_exc()
         open(POT_PATH_ERROR, 'w+').write('ERROR')
